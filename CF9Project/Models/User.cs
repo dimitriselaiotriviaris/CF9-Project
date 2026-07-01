@@ -16,6 +16,6 @@
 
         public Gamer? Gamer { get; set; }
 
-        public GameCompany? Company { get; set; }
+        public GameCompany? GameCompany { get; set; }
     }
 }
