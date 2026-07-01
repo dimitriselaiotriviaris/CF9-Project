@@ -1,4 +1,8 @@
 using CF9Project.Data;
+using CF9Project.Repositories;
+using CF9Project.Security;
+using CF9Project.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
