@@ -27,7 +27,6 @@
 	<ItemGroup>
 		<Folder Include="Models\" />
 		<Folder Include="Data\" />
-		<Folder Include="Configurations\" />
 		<Folder Include="Core\" />
 		<Folder Include="DTO\" />
 		<Folder Include="Exceptions\" />
