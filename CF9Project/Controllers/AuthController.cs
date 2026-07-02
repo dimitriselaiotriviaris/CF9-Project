@@ -28,7 +28,7 @@ namespace CF9Project.Controllers
         public async Task<ActionResult<UserReadOnlyDTO>> RegisterTeacher(
             [FromBody] GameCompanySignupDTO gameCompanySignupDTO)
         {
-            var createdUser = await _applicationService.TeacherService
+            var createdUser = await _applicationService.GameCompanyService
                 .SignUpUserAsync(gameCompanySignupDTO);
 
             return CreatedAtAction(

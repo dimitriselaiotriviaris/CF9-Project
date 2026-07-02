@@ -7,6 +7,6 @@ namespace CF9Project.Services
 {
     public interface IGamerService
     {
-        Task<PaginatedResult<UserReadOnlyDTO>> GetPaginatedStudentsAsync(int pageNumber, int pageSize);
+        Task<PaginatedResult<UserReadOnlyDTO>> GetPaginatedGamersAsync(int pageNumber, int pageSize);
     }
 }

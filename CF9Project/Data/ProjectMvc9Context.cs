@@ -9,7 +9,7 @@ namespace CF9Project.Data
 
         public DbSet<Capability> Capabilities { get; set; }
         
-        public DbSet<Game> Game {  get; set; }
+        public DbSet<Game> Games {  get; set; }
         
         public DbSet<Role> Reols { get; set; }
 

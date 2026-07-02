@@ -59,7 +59,7 @@ namespace CF9Project.Repositories
             List<Game> games;
 
             games = await _context.Games
-                .Where(c => c.GameCompany == gameCompanyId)
+                .Where(c => c.GameCompanyId == gameCompanyId)
                 .ToListAsync();
 
             return games;

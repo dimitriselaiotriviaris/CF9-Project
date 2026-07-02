@@ -8,7 +8,7 @@ namespace CF9Project.Repositories
     {
 
         Task<List<Game>> GetGameCompanyGamesAsync(int teacherId);
-        Task<User?> GetUserTeacherByUsernameAsync(string username);
+        Task<User?> GetUserGameCompanyByUsernameAsync(string username);
         Task<PaginatedResult<User>> GetPaginatedTeachersAsync(int pageNumber, int pageSize,
             List<Expression<Func<User, bool>>> predicates);
     }

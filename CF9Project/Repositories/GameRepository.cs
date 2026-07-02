@@ -10,7 +10,7 @@ namespace CF9Project.Repositories
         {
         }
 
-        public async Task<List<Gamer>> GetGameGamerAsync(int gameId)
+        public async Task<List<Gamer>> GetGameGamersAsync(int gameId)
         {
             return await _context.Games
                .Where(c => c.Id == gameId)

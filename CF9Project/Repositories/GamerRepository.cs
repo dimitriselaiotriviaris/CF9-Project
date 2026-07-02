@@ -19,7 +19,7 @@ namespace CF9Project.Repositories
                 .SingleOrDefaultAsync(); // fetched zero or one
         }
 
-        public async Task<PaginatedResult<User>> GetPaginatedUsersStudentsAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<User>> GetPaginatedUsersGamersAsync(int pageNumber, int pageSize)
         {
             int skip = (pageNumber - 1) * pageSize;
 
@@ -38,7 +38,7 @@ namespace CF9Project.Repositories
             return new PaginatedResult<User>(usersWithRoleStudent, totalRecords, pageNumber, pageSize);
         }
 
-        public async Task<PaginatedResult<Gamer>> GetPaginatedUsersStudentsFilteredAsync(int pageNumber, 
+        public async Task<PaginatedResult<Gamer>> GetPaginatedUsersGamersFilteredAsync(int pageNumber, 
             int pageSize, List<Expression<Func<Gamer, bool>>> predicates)
         {
             IQueryable<Gamer> query = _context.Gamers;
@@ -73,7 +73,7 @@ namespace CF9Project.Repositories
             };
         }
 
-        public async Task<List<Game>> GetStudentCoursesAsync(int gamerId)
+        public async Task<List<Game>> GetGamerGamesAsync(int gamerId)
         {
             List<Game> games;
 

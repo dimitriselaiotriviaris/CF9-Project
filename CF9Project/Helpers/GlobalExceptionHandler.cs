@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SchoolApp.Exceptions;
+using CF9Project.Exceptions;
 
 namespace CF9Project.Helpers
 {
