@@ -1,3 +1,8 @@
+using CF9Project.Configuration;
+using CF9Project.Helpers;
+using CF9Project.Repositories;
+using CF9Project.Security;
+using CF9Project.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +18,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace CF9Project
+namespace SchoolApp
 {
     public class Program
     {
@@ -28,9 +33,8 @@ namespace CF9Project
 
             var connString = builder.Configuration.GetConnectionString("DevConnection");
 
-            // Scoped - per request
             builder.Services.AddDbContext<ProjectMvc9Context>(options =>
-            options.UseSqlServer(connString));
+                    options.UseSqlServer(connString));
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGameCompanyService, GameCompanyService>();
@@ -40,47 +44,103 @@ namespace CF9Project
 
             builder.Services.AddRepositories();
 
-            builder.Services.AddAuthentication(CoockieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
+            builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MapperConfig>());
+
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                //options.IncludeErrorDetails = builder.Environment.IsDevelopment();  // χρήσιμο σε development, δείχνει αναλυτικά errors. Στο production βάζουμε false.
+                // options.SaveToken = true; αποθηκεύει το token στο HttpContext ώστε να μπορούμε να το διαβάσουμε μετά με HttpContext.GetTokenAsync("access_token")
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.LoginPath = "/User/Login";
-                    options.AccessDeniedPath = "/Home/AccessDenied";
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                    options.SlidingExpiration = true;   // reset timeout
-                });
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
 
-            builder.Services.AddAuthorizationBuilder()
-                .SetFallbackPolicy(new AuthorizationPolicyBuilder())
-                .RequireAuthenticatedUser()
-                .Build());
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
 
-            builder.Services.AddAutoMapper(cfg => cfg.AddProfile<Configuration.MapperConfig>());
+                    ValidateLifetime = true,
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+                    ValidateIssuerSigningKey = true,
+
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]!))
+                };
+            });
+
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowClient", policy =>
+                policy.WithOrigins(builder.Configuration["Cors:Origin"]!)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+            });
+
+
+
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+
+            builder.Services.AddEndpointsApiExplorer();
+
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "School App", Version = "v1" });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
+
+                // options.SupportNonNullableReferenceTypes(); // default true > .NET 6
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,
+                    new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme.",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.Http,
+                        Scheme = JwtBearerDefaults.AuthenticationScheme,
+                        BearerFormat = "JWT"
+                    });
+                options.OperationFilter<AuthorizeOperationFilter>();
+            });
+
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+            builder.Services.AddProblemDetails();
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("VIEW_USERS", p => p.RequireClaim("capability", "VIEW_USERS"));
+            });
 
             var app = builder.Build();
 
+            app.UseExceptionHandler();
+
             // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                app.UseSwagger();
+                app.UseSwaggerUI();
+                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "School App v1"));
+                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v2/swagger.json", "School App v2"));
             }
 
             app.UseHttpsRedirection();
-            app.UseRouting();
 
+            app.UseCors("AllowClient");
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapStaticAssets().AllowAnonymous();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+            app.MapControllers();
 
             app.Run();
         }
