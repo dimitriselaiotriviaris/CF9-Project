@@ -1,10 +1,17 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using CF9Project.Configuration;
 using CF9Project.Data;
+using CF9Project.Helpers;
 using CF9Project.Repositories;
 using CF9Project.Security;
 using CF9Project.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Reflection;
+using System.Text;
+using System.Text.Json.Serialization;
 
 namespace CF9Project
 {
