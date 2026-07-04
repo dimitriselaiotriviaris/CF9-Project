@@ -27,7 +27,7 @@ namespace CF9Project.Services
 
         public async Task<UserReadOnlyDTO> SignUpUserAsync(GameCompanySignupDTO request)
         {
-            var teacher = _mapper.Map<GameCompany>(request);
+            var gameCompany = _mapper.Map<GameCompany>(request);
             var user = _mapper.Map<User>(request);
            
             

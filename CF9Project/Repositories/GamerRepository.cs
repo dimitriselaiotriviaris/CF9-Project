@@ -12,12 +12,6 @@ namespace CF9Project.Repositories
         {
         }
 
-        public async Task<Gamer?> GetByAmAsync(string? am)
-        {
-            return await _context.Gamers
-                .Where(s => s.Am == am)
-                .SingleOrDefaultAsync(); // fetched zero or one
-        }
 
         public async Task<PaginatedResult<User>> GetPaginatedUsersGamersAsync(int pageNumber, int pageSize)
         {
