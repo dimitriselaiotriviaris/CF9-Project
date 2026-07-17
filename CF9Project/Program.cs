@@ -54,7 +54,7 @@ namespace SchoolApp
             }).AddJwtBearer(options =>
             {
                 //options.IncludeErrorDetails = builder.Environment.IsDevelopment();  // χρήσιμο σε development, δείχνει αναλυτικά errors. Στο production βάζουμε false.
-                // options.SaveToken = true; αποθηκεύει το token στο HttpContext ώστε να μπορούμε να το διαβάσουμε μετά με HttpContext.GetTokenAsync("access_token")
+                //options.SaveToken = true; αποθηκεύει το token στο HttpContext ώστε να μπορούμε να το διαβάσουμε μετά με HttpContext.GetTokenAsync("access_token")
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -93,10 +93,14 @@ namespace SchoolApp
 
             builder.Services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "School App", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Project App", Version = "v1" });
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                options.IncludeXmlComments(xmlPath);
+
+                if (File.Exists(xmlPath))
+                {
+                    options.IncludeXmlComments(xmlPath);
+                }
 
                 // options.SupportNonNullableReferenceTypes(); // default true > .NET 6
                 options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,

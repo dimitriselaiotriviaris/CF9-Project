@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CF9Project.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,8 +71,6 @@ namespace CF9Project.Migrations
                     Username = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
-                    Firstname = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Lastname = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -91,29 +89,6 @@ namespace CF9Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Gamer",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Gamers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Gamers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "GameCompanies",
                 columns: table => new
                 {
@@ -129,7 +104,30 @@ namespace CF9Project.Migrations
                 {
                     table.PrimaryKey("PK_GameCompanies", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GameCompanies_UserId",
+                        name: "FK_GameCompanys_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Gamers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Gamers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Gamer_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -143,6 +141,8 @@ namespace CF9Project.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    Genre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GameCompanyId = table.Column<int>(type: "int", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -160,33 +160,50 @@ namespace CF9Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GamersGames",
+                name: "GamesGamers",
                 columns: table => new
                 {
-                    GamesId = table.Column<int>(type: "int", nullable: false),
-                    GamersId = table.Column<int>(type: "int", nullable: false)
+                    GamersId = table.Column<int>(type: "int", nullable: false),
+                    GamesId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GamersGames", x => new { x.GamesId, x.GamersId });
+                    table.PrimaryKey("PK_GamesGamers", x => new { x.GamersId, x.GamesId });
                     table.ForeignKey(
-                        name: "FK_GamersGames_Games_GamesId",
-                        column: x => x.GamesId,
-                        principalTable: "Games",
+                        name: "FK_GamesGamers_Gamers_GamersId",
+                        column: x => x.GamersId,
+                        principalTable: "Gamers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GamersGames_Gamers_GamersId",
-                        column: x => x.GamersId,
-                        principalTable: "Gamers",
+                        name: "FK_GamesGamers_Games_GamesId",
+                        column: x => x.GamesId,
+                        principalTable: "Games",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Capabilities_Name",
+                table: "Capabilities",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
                 name: "UQ_Capabilities_Name",
                 table: "Capabilities",
                 column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameCompanys_UserId",
+                table: "GameCompanies",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_UserId",
+                table: "Gamers",
+                column: "UserId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -198,6 +215,16 @@ namespace CF9Project.Migrations
                 name: "IX_Games_GameCompanyId",
                 table: "Games",
                 column: "GameCompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GamesGamers_GamesId",
+                table: "GamesGamers",
+                column: "GamesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Roles_Name",
+                table: "Roles",
+                column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "UQ_Roles_Name",
@@ -214,23 +241,6 @@ namespace CF9Project.Migrations
                 name: "IX_RolesCapabilities_RolesId",
                 table: "RolesCapabilities",
                 column: "RolesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Gamers_UserId",
-                table: "Gamers",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GamersGames_GamesId",
-                table: "GamersGames",
-                column: "GamesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GameCompanies_UserId",
-                table: "GameCompanies",
-                column: "UserId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -254,19 +264,19 @@ namespace CF9Project.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "GamesGamers");
+
+            migrationBuilder.DropTable(
                 name: "RolesCapabilities");
 
             migrationBuilder.DropTable(
-                name: "GamersGames");
-
-            migrationBuilder.DropTable(
-                name: "Capabilities");
+                name: "Gamers");
 
             migrationBuilder.DropTable(
                 name: "Games");
 
             migrationBuilder.DropTable(
-                name: "Gamers");
+                name: "Capabilities");
 
             migrationBuilder.DropTable(
                 name: "GameCompanies");
