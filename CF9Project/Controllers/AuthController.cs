@@ -25,7 +25,7 @@ namespace CF9Project.Controllers
         [ProducesResponseType(typeof(UserReadOnlyDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<UserReadOnlyDTO>> RegisterTeacher(
+        public async Task<ActionResult<UserReadOnlyDTO>> RegisterGameCompany(
             [FromBody] GameCompanySignupDTO gameCompanySignupDTO)
         {
             var createdUser = await _applicationService.GameCompanyService
